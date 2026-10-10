@@ -11,7 +11,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 
 import { BrutalButton, GroupBar, Tile } from '@/components/brutal';
 import {
@@ -28,6 +27,7 @@ import {
   type GuessResult,
 } from '@/lib/game/engine';
 import { MAX_MISTAKES, type Puzzle } from '@/lib/game/types';
+import { haptic } from '@/lib/haptics';
 import { BORDER, FONT, usePalette } from '@/lib/theme';
 import { useReward } from '@/lib/use-reward';
 
@@ -73,9 +73,9 @@ export function GameBoard({ puzzle, state, onChange }: Props) {
   const onSubmit = () => {
     const { state: next, result } = submit(puzzle, state);
     if (result === 'correct') {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptic.success();
     } else {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptic.error();
       if (!reduced && result !== 'repeat') {
         shake.value = withSequence(
           withTiming(-8, { duration: 50 }),

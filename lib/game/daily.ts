@@ -35,7 +35,10 @@ export function puzzleForDate(puzzles: readonly Puzzle[], date: string): Puzzle 
 }
 
 /** Архив: вышедшие квартеты до текущего включительно, новые сверху. */
-export function releasedPuzzles(puzzles: readonly Puzzle[], now: Date = new Date()): Puzzle[] {
+export function releasedPuzzles(
+  puzzles: readonly Puzzle[],
+  now: Date = new Date(),
+): (Puzzle & { date: string })[] {
   const today = currentPuzzleDate(now);
   return puzzles
     .filter((p): p is Puzzle & { date: string } => !!p.date && p.date <= today)

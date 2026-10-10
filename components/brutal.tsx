@@ -1,7 +1,7 @@
 // Базовые элементы необрутализма: коробка с обводкой и жёсткой тенью, кнопка, плитка слова, плашка группы.
 import { useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { haptic } from '@/lib/haptics';
 
 import { BORDER, FONT, PRESSED, RADIUS, SHADOW, usePalette, type GroupLevel } from '@/lib/theme';
 
@@ -72,7 +72,7 @@ export function BrutalButton({
       onPressIn={() => setDown(true)}
       onPressOut={() => setDown(false)}
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        haptic.tap();
         onPress();
       }}
       style={[{ opacity: disabled ? 0.45 : 1 }, style]}
@@ -112,7 +112,7 @@ export function Tile({ word, selected, hint, onPress }: TileProps) {
       accessibilityState={{ selected }}
       accessibilityLabel={word}
       onPress={() => {
-        void Haptics.selectionAsync();
+        haptic.select();
         onPress();
       }}
       style={styles.tileWrap}

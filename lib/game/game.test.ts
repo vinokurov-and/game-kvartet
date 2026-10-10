@@ -153,3 +153,12 @@ test('подсказки: тема самой лёгкой группы, зат�
   s = nextHint(P, s);
   assert.deepEqual(s.hintThemes, [1, 2]);
 });
+
+test('сохранение старой версии без полей подсказок не ломает подсказки (падение сборки 2)', async () => {
+  const { withDefaults, canHint, nextHint } = await import('./engine');
+  const { hintThemes: _t, hintWords: _w, ...old } = newGame(P);
+  const restored = withDefaults(old as GameState);
+  assert.deepEqual(restored.hintWords, []);
+  assert.equal(canHint(P, restored), true);
+  assert.deepEqual(nextHint(P, restored).hintThemes, [1]);
+});

@@ -1,11 +1,13 @@
-// Квартет дня: шапка, игровое поле, после завершения — итог.
+// Квартет дня: шапка с навигацией, игровое поле, после завершения — итог.
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { DateTime } from 'luxon';
 
 import { GameBoard } from '@/components/game-board';
+import { HowToBody } from '@/components/how-to-body';
 import { ResultPanel } from '@/components/result-panel';
+import { HeaderLink, Screen } from '@/components/screen';
 import { PUZZLES } from '@/content/puzzles';
 import { currentPuzzleDate, puzzleForDate } from '@/lib/game/daily';
 import { useGameStore } from '@/lib/game/store';
@@ -13,7 +15,7 @@ import { FONT, usePalette } from '@/lib/theme';
 
 export default function Today() {
   const p = usePalette();
-  const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [date, setDate] = useState(currentPuzzleDate);
   const puzzle = useMemo(() => puzzleForDate(PUZZLES, date), [date]);
 
@@ -23,27 +25,37 @@ export default function Today() {
     return () => clearInterval(t);
   }, []);
 
+  // Первый запуск — сразу правила.
+  const seenHowTo = useGameStore((s) => s.seenHowTo);
+  const [hydrated, setHydrated] = useState(useGameStore.persist.hasHydrated());
+  useEffect(() => useGameStore.persist.onFinishHydration(() => setHydrated(true)), []);
+
   const games = useGameStore((s) => s.games);
   const saveGame = useGameStore((s) => s.saveGame);
   const recordDaily = useGameStore((s) => s.recordDaily);
   const getGame = useGameStore((s) => s.getGame);
-  const state = puzzle ? (games[puzzle.id] ?? getGame(puzzle)) : null;
+  // Только через getGame: он достраивает сохранения старых версий (иначе новые поля undefined → падение).
+  const state = puzzle && games ? getGame(puzzle) : null;
+
+  // Правила показываем на месте, без навигации: при старте корневой навигатор может быть ещё не смонтирован.
+  if (hydrated && !seenHowTo) return <HowToBody onDone={() => {}} />;
 
   const pretty = DateTime.fromISO(date).setLocale('ru').toFormat('d MMMM');
 
   return (
-    <ScrollView
-      style={{ backgroundColor: p.bg }}
-      contentContainerStyle={[
-        styles.root,
-        { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 20 },
-      ]}
+    <Screen
+      title="Квартет"
+      subtitle={puzzle ? `№${puzzle.id} · ${pretty}` : pretty}
+      right={
+        <View style={styles.nav}>
+          <HeaderLink label="?" onPress={() => router.push('/how-to')} />
+          <HeaderLink label="Меню" onPress={() => router.push('/settings')} />
+        </View>
+      }
     >
-      <View style={styles.header}>
-        <Text style={[styles.logo, { color: p.ink }]}>Квартет</Text>
-        <Text style={[styles.meta, { color: p.muted }]}>
-          {puzzle ? `№${puzzle.id} · ${pretty}` : pretty}
-        </Text>
+      <View style={styles.links}>
+        <HeaderLink label="Архив" onPress={() => router.push('/archive')} />
+        <HeaderLink label="Тренировка" onPress={() => router.push('/training')} />
       </View>
 
       {!puzzle || !state ? (
@@ -69,19 +81,18 @@ export default function Today() {
             <ResultPanel
               puzzle={puzzle}
               state={state}
+              mode="daily"
               onChange={(next) => saveGame(puzzle, next)}
             />
           )}
         </>
       )}
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { paddingHorizontal: 16, gap: 12, flexGrow: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  logo: { fontFamily: FONT.display, fontSize: 26 },
-  meta: { fontFamily: FONT.body, fontSize: 13 },
+  nav: { flexDirection: 'row', gap: 8 },
+  links: { flexDirection: 'row', gap: 8 },
   hint: { fontFamily: FONT.bodySemi, fontSize: 15 },
 });

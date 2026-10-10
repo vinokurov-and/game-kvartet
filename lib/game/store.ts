@@ -38,6 +38,16 @@ interface GameStore {
   saveGame: (puzzle: Puzzle, state: GameState) => void;
   /** Учесть завершённый ежедневный квартет в статистике и серии. */
   recordDaily: (puzzle: Puzzle & { date: string }, state: GameState) => void;
+  /** Архивные дни, открытые за рекламу. */
+  unlocked: number[];
+  unlock: (id: number) => void;
+  /** Сыгранные головоломки тренировки — для частоты межстраничной рекламы. */
+  trainingDone: number;
+  finishTraining: () => void;
+  seenHowTo: boolean;
+  setSeenHowTo: () => void;
+  haptics: boolean;
+  setHaptics: (on: boolean) => void;
 }
 
 function dayBefore(date: string): string {
@@ -54,6 +64,14 @@ export const useGameStore = create<GameStore>()(
       games: {},
       stats: EMPTY_STATS,
       counted: [],
+      unlocked: [],
+      unlock: (id) => set((s) => ({ unlocked: [...new Set([...s.unlocked, id])] })),
+      trainingDone: 0,
+      finishTraining: () => set((s) => ({ trainingDone: s.trainingDone + 1 })),
+      seenHowTo: false,
+      setSeenHowTo: () => set({ seenHowTo: true }),
+      haptics: true,
+      setHaptics: (on) => set({ haptics: on }),
       getGame: (puzzle) => {
         const saved = get().games[puzzle.id];
         return saved ? withDefaults(saved) : newGame(puzzle);

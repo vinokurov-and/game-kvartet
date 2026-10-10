@@ -1,6 +1,6 @@
 // Реклама Yandex Mobile Ads. Правила (спека 2.6): первая сессия без рекламы; ATT — до инициализации SDK;
 // если реклама не загрузилась, награду всё равно выдаём — игрок не должен застрять из-за отсутствия показа.
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 type YandexAds = typeof import('yandex-mobile-ads');
 
@@ -19,6 +19,8 @@ let initPromise: Promise<boolean> | null = null;
 
 function loadSdk(): YandexAds | null {
   if (Platform.OS === 'web') return null;
+  // В сборках без нативного SDK (TestFlight 1.0.0 (2)) модуль не трогаем вовсе.
+  if (!NativeModules.YandexMobileAds) return null;
   if (!sdk) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

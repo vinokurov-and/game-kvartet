@@ -1,4 +1,4 @@
-// Итог квартета: заголовок, сетка попыток, статистика, таймер до следующего, шеринг.
+// Итог партии. День — статистика, серия, таймер, шеринг; архив — без статистики; тренировка — «Дальше».
 import { useEffect, useState } from 'react';
 import { Share, StyleSheet, Text, View } from 'react-native';
 
@@ -11,8 +11,12 @@ import type { Puzzle } from '@/lib/game/types';
 import { BORDER, FONT, usePalette } from '@/lib/theme';
 import { useReward } from '@/lib/use-reward';
 
-function title(state: GameState): [string, string] {
-  if (state.status === 'lost') return ['Не в этот раз', 'Завтра будет новый квартет'];
+export type PlayMode = 'daily' | 'archive' | 'training';
+
+function title(state: GameState, mode: PlayMode): [string, string] {
+  if (state.status === 'lost') {
+    return ['Не в этот раз', mode === 'daily' ? 'Завтра будет новый квартет' : 'Бывает и такое'];
+  }
   if (state.continued) return ['Решено!', 'Со второго захода'];
   const m = state.mistakes;
   if (m === 0) return ['Безупречно!', 'Без единой ошибки'];
@@ -23,21 +27,24 @@ function title(state: GameState): [string, string] {
 interface Props {
   puzzle: Puzzle;
   state: GameState;
+  mode: PlayMode;
   onChange: (next: GameState) => void;
+  onNext?: () => void;
 }
 
-export function ResultPanel({ puzzle, state, onChange }: Props) {
+export function ResultPanel({ puzzle, state, mode, onChange, onNext }: Props) {
   const p = usePalette();
   const reward = useReward();
   const stats = useGameStore((s) => s.stats);
   const [left, setLeft] = useState(msUntilNext);
 
   useEffect(() => {
+    if (mode !== 'daily') return;
     const t = setInterval(() => setLeft(msUntilNext()), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [mode]);
 
-  const [head, sub] = title(state);
+  const [head, sub] = title(state, mode);
   const winRate = stats.played ? Math.round((stats.won / stats.played) * 100) : 0;
 
   return (
@@ -58,22 +65,25 @@ export function ResultPanel({ puzzle, state, onChange }: Props) {
         ))}
       </View>
 
-      <View style={styles.stats}>
-        {[
-          [String(stats.currentStreak), 'дней подряд'],
-          [`${winRate}%`, 'побед'],
-          [String(stats.played), 'сыграно'],
-        ].map(([v, l]) => (
-          <BrutalBox key={l} style={styles.flex} contentStyle={styles.stat}>
-            <Text style={[styles.statValue, { color: p.ink }]}>{v}</Text>
-            <Text style={[styles.statLabel, { color: p.muted }]}>{l}</Text>
-          </BrutalBox>
-        ))}
-      </View>
-
-      <Text style={[styles.next, { color: p.muted }]}>
-        Следующий квартет через {formatCountdown(left)}
-      </Text>
+      {mode === 'daily' && (
+        <>
+          <View style={styles.stats}>
+            {[
+              [String(stats.currentStreak), 'дней подряд'],
+              [`${winRate}%`, 'побед'],
+              [String(stats.played), 'сыграно'],
+            ].map(([v, l]) => (
+              <BrutalBox key={l} style={styles.flex} contentStyle={styles.stat}>
+                <Text style={[styles.statValue, { color: p.ink }]}>{v}</Text>
+                <Text style={[styles.statLabel, { color: p.muted }]}>{l}</Text>
+              </BrutalBox>
+            ))}
+          </View>
+          <Text style={[styles.next, { color: p.muted }]}>
+            Следующий квартет через {formatCountdown(left)}
+          </Text>
+        </>
+      )}
 
       {state.status === 'lost' && !state.continued && (
         <BrutalButton
@@ -88,11 +98,15 @@ export function ResultPanel({ puzzle, state, onChange }: Props) {
           onPress={() => void reward.run(() => onChange(grantExtraLives(state)))}
         />
       )}
-      <BrutalButton
-        label="Поделиться"
-        primary
-        onPress={() => void Share.share({ message: shareText(puzzle, state) })}
-      />
+      {mode === 'training' && onNext ? (
+        <BrutalButton label="Дальше" primary onPress={onNext} />
+      ) : (
+        <BrutalButton
+          label="Поделиться"
+          primary
+          onPress={() => void Share.share({ message: shareText(puzzle, state) })}
+        />
+      )}
     </View>
   );
 }
