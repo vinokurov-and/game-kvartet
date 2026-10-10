@@ -39,7 +39,8 @@
     "production": {
       "ios": {
         "appleId": "vinokurov_and@icloud.com",
-        "appleTeamId": "5JYA44666K"
+        "appleTeamId": "5JYA44666K",
+        "ascAppId": "6821346773"
       }
     }
   }
