@@ -177,3 +177,25 @@ test('партия от другой головоломки под тем же i
   assert.equal(matchesPuzzle(P, newGame(P)), true);
   assert.equal(matchesPuzzle(P, newGame(other)), false);
 });
+
+test('кодек контента: туда-обратно, кириллица и Ё', async () => {
+  const { encode, decode } = await import('./codec');
+  const s = JSON.stringify(P) + 'ЁЖИК ёж';
+  assert.equal(decode(encode(s)), s);
+  assert.ok(!encode(s).includes('ЧАЙКА'));
+});
+
+test('бандл контента: все головоломки валидны, даты подряд, id уникальны', async () => {
+  const { DAILY, TRAINING } = await import('../../content/generated');
+  const { decode } = await import('./codec');
+  const daily = JSON.parse(decode(DAILY)) as Puzzle[];
+  const training = JSON.parse(decode(TRAINING)) as Puzzle[];
+  assert.ok(daily.length >= 90);
+  for (const p of [...daily, ...training]) assert.deepEqual(validatePuzzle(p), [], `№${p.id}`);
+  for (let i = 1; i < daily.length; i++) {
+    const prev = new Date(`${daily[i - 1].date}T12:00:00Z`).getTime();
+    const cur = new Date(`${daily[i].date}T12:00:00Z`).getTime();
+    assert.equal(cur - prev, 86_400_000, `дата №${daily[i].id}`);
+  }
+  assert.ok(training.every((t) => t.id >= 10000));
+});

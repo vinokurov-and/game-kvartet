@@ -95,6 +95,9 @@ export function BrutalButton({
   );
 }
 
+/** Средняя ширина заглавной кириллицы Onest Bold в долях кегля (с запасом) + рамки/отступы плитки. */
+const TILE_CHAR_EM = 0.78;
+
 interface TileProps {
   word: string;
   selected: boolean;
@@ -105,7 +108,13 @@ interface TileProps {
 
 export function Tile({ word, selected, hint, onPress }: TileProps) {
   const p = usePalette();
-  const long = word.length > 7;
+  // Одно слово — строго в одну строку (иначе рвётся посреди слова), фраза — по строке на слово.
+  // Размер шрифта — из реальной ширины плитки: самое длинное слово должно влезть целиком (на всех платформах).
+  const phrase = word.includes(' ') || word.includes('-');
+  const longest = Math.max(...word.split(/[ -]/).map((x) => x.length));
+  const [width, setWidth] = useState(0);
+  const fit = width ? (width - 22) / (longest * TILE_CHAR_EM) : 13;
+  const fontSize = Math.max(8, Math.min(13, Math.floor(fit * 2) / 2));
   return (
     <Pressable
       accessibilityRole="button"
@@ -116,6 +125,7 @@ export function Tile({ word, selected, hint, onPress }: TileProps) {
         onPress();
       }}
       style={styles.tileWrap}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
     >
       <BrutalBox
         fill={selected ? p.ink : (hint ?? p.surface)}
@@ -124,12 +134,12 @@ export function Tile({ word, selected, hint, onPress }: TileProps) {
         contentStyle={styles.tileContent}
       >
         <Text
-          numberOfLines={2}
+          numberOfLines={phrase ? 2 : 1}
           adjustsFontSizeToFit
           minimumFontScale={0.7}
           style={[
             styles.tileText,
-            { color: selected ? p.inkOnInk : hint ? p.onGroup : p.ink, fontSize: long ? 11 : 13 },
+            { color: selected ? p.inkOnInk : hint ? p.onGroup : p.ink, fontSize },
           ]}
         >
           {word}
@@ -158,7 +168,7 @@ export function GroupBar({ level, theme, words }: GroupBarProps) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   buttonContent: { paddingVertical: 13, paddingHorizontal: 6, alignItems: 'center' },
-  buttonLabel: { fontFamily: FONT.bodyBold, fontSize: 15 },
+  buttonLabel: { fontFamily: FONT.bodyBold, fontSize: 14 },
   tileWrap: { width: '100%', aspectRatio: 1 / 0.92, padding: 3 },
   tileContent: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
   tileText: { fontFamily: FONT.bodyBold, textAlign: 'center', letterSpacing: 0.2 },
