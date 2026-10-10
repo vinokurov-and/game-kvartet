@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   buttonContent: { paddingVertical: 13, paddingHorizontal: 10, alignItems: 'center' },
   buttonLabel: { fontFamily: FONT.bodyBold, fontSize: 15 },
-  tileWrap: { width: '25%', aspectRatio: 1 / 0.92, padding: 3 },
+  tileWrap: { width: '100%', aspectRatio: 1 / 0.92, padding: 3 },
   tileContent: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
   tileText: { fontFamily: FONT.bodyBold, textAlign: 'center', letterSpacing: 0.2 },
   groupContent: { paddingVertical: 12, paddingHorizontal: 10, alignItems: 'center', gap: 3 },
