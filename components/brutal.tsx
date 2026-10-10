@@ -82,7 +82,14 @@ export function BrutalButton({
         sunk={down}
         contentStyle={styles.buttonContent}
       >
-        <Text style={[styles.buttonLabel, { color: primary ? '#111111' : p.ink }]}>{label}</Text>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          style={[styles.buttonLabel, { color: primary ? '#111111' : p.ink }]}
+        >
+          {label}
+        </Text>
       </BrutalBox>
     </Pressable>
   );
@@ -148,7 +155,7 @@ export function GroupBar({ level, theme, words }: GroupBarProps) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  buttonContent: { paddingVertical: 13, paddingHorizontal: 10, alignItems: 'center' },
+  buttonContent: { paddingVertical: 13, paddingHorizontal: 6, alignItems: 'center' },
   buttonLabel: { fontFamily: FONT.bodyBold, fontSize: 15 },
   tileWrap: { width: '100%', aspectRatio: 1 / 0.92, padding: 3 },
   tileContent: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
