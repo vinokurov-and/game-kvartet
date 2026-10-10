@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Квартет — направления дизайна</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@500;600;700;800&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --page:#ECECEF; --ink:#1A1A1F; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--page); color:var(--ink); font-family:Onest, system-ui, sans-serif; padding:32px 16px 64px; }
+  h1 { font:800 28px/1.1 Unbounded, sans-serif; text-align:center; }
+  .lead { text-align:center; color:#5a5a66; margin:10px auto 36px; max-width:720px; line-height:1.5; }
+  .dir { max-width:1100px; margin:0 auto 56px; }
+  .dir h2 { font:700 20px/1.2 Unbounded, sans-serif; margin-bottom:6px; }
+  .dir p.note { color:#5a5a66; margin-bottom:18px; line-height:1.5; max-width:780px; }
+  .row { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+  .phone { width:340px; height:700px; border-radius:44px; padding:14px; background:#111; box-shadow:0 30px 60px rgba(0,0,0,.18); }
+  .screen { width:100%; height:100%; border-radius:32px; overflow:hidden; position:relative; display:flex; flex-direction:column; padding:52px 18px 22px; }
+  .status { position:absolute; top:16px; left:28px; right:28px; display:flex; justify-content:space-between; font:600 13px/1 Onest, sans-serif; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .logo { font-size:22px; }
+  .meta { font-size:12px; opacity:.7; }
+  .hint { font-size:14px; margin-bottom:12px; }
+  .board { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .solved { grid-column:1 / -1; padding:12px 10px; text-align:center; }
+  .solved b { display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+  .solved span { font-size:12px; }
+  .tile { aspect-ratio:1 / .92; display:flex; align-items:center; justify-content:center; text-align:center; font-size:10.5px; font-weight:700; letter-spacing:.02em; padding:3px; word-break:keep-all; overflow-wrap:normal; hyphens:none; }
+  .tile.long { font-size:8.6px; letter-spacing:0; }
+  .mist { display:flex; gap:7px; align-items:center; justify-content:center; margin:16px 0 14px; font-size:13px; }
+  .dot { width:11px; height:11px; border-radius:50%; }
+  .btns { display:flex; gap:8px; margin-top:auto; }
+  .btn { flex:1; padding:13px 6px; text-align:center; font-size:13px; font-weight:700; }
+  .ad { margin-top:10px; text-align:center; font-size:12px; opacity:.75; }
+  /* result */
+  .res-title { font-size:26px; margin:16px 0 4px; }
+  .res-sub { font-size:14px; opacity:.75; margin-bottom:22px; }
+  .grid-res { display:grid; grid-template-columns:repeat(4,34px); gap:6px; justify-content:center; margin:6px 0 22px; }
+  .sq { width:34px; height:34px; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+  .stat { padding:12px 6px; text-align:center; }
+  .stat b { display:block; font-size:22px; }
+  .stat span { font-size:11px; opacity:.75; }
+  .next { text-align:center; font-size:13px; opacity:.75; margin-bottom:12px; }
+
+  /* ===== A: Свежий минимализм ===== */
+  .A .screen { background:#FAFAF7; color:#16161A; font-family:Manrope, sans-serif; }
+  .A .logo { font:800 22px/1 Manrope, sans-serif; letter-spacing:-.02em; }
+  .A .tile { background:#EDECE6; border-radius:14px; color:#16161A; }
+  .A .tile.sel { background:#16161A; color:#FAFAF7; }
+  .A .solved { border-radius:14px; }
+  .A .l1 { background:#FFE27A; } .A .l2 { background:#A8E6A1; } .A .l3 { background:#9CC8FF; } .A .l4 { background:#D7B4FF; }
+  .A .dot { background:#16161A; } .A .dot.off { background:#DADAD3; }
+  .A .btn { border-radius:999px; border:1.5px solid #16161A; }
+  .A .btn.pri { background:#16161A; color:#fff; }
+  .A .stat { background:#EDECE6; border-radius:14px; }
+  .A .res-title { font:800 26px/1.1 Manrope, sans-serif; letter-spacing:-.02em; }
+
+  /* ===== B: Тёмное стекло ===== */
+  .B .screen { background:radial-gradient(120% 70% at 20% 0%, #2B2160 0%, #0E0D1A 55%, #08080F 100%); color:#F2F1FF; font-family:Onest, sans-serif; }
+  .B .logo { font:700 21px/1 Unbounded, sans-serif; background:linear-gradient(90deg,#FFD36E,#FF7AC6,#8B8CFF); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .B .tile { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:16px; color:#F2F1FF; backdrop-filter:blur(8px); }
+  .B .tile.sel { background:linear-gradient(135deg,#8B8CFF,#FF7AC6); border-color:transparent; box-shadow:0 6px 18px rgba(255,122,198,.35); }
+  .B .solved { border-radius:16px; color:#0E0D1A; }
+  .B .l1 { background:linear-gradient(135deg,#FFE48A,#FFC15E); } .B .l2 { background:linear-gradient(135deg,#8CF5C2,#3FD39A); } .B .l3 { background:linear-gradient(135deg,#8FD3FF,#5B8CFF); } .B .l4 { background:linear-gradient(135deg,#E6A8FF,#B36BFF); }
+  .B .dot { background:#FF7AC6; box-shadow:0 0 8px #FF7AC6; } .B .dot.off { background:rgba(255,255,255,.15); box-shadow:none; }
+  .B .btn { border-radius:16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); }
+  .B .btn.pri { background:linear-gradient(90deg,#8B8CFF,#FF7AC6); border:none; }
+  .B .stat { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:16px; }
+  .B .res-title { font:700 24px/1.15 Unbounded, sans-serif; }
+
+  /* ===== C: Необрутализм ===== */
+  .C .screen { background:#FFF6E5; color:#111; font-family:Onest, sans-serif; }
+  .C .logo { font:800 22px/1 Unbounded, sans-serif; }
+  .C .tile { background:#fff; border:2.5px solid #111; border-radius:10px; box-shadow:3px 3px 0 #111; color:#111; }
+  .C .tile.sel { background:#111; color:#FFF6E5; transform:translate(2px,2px); box-shadow:1px 1px 0 #111; }
+  .C .solved { border:2.5px solid #111; border-radius:10px; box-shadow:3px 3px 0 #111; }
+  .C .l1 { background:#FFD23F; } .C .l2 { background:#3DDC97; } .C .l3 { background:#4D96FF; } .C .l4 { background:#FF6B9A; }
+  .C .dot { background:#FF6B9A; border:2px solid #111; width:13px; height:13px; } .C .dot.off { background:#fff; }
+  .C .btn { border:2.5px solid #111; border-radius:10px; background:#fff; box-shadow:3px 3px 0 #111; }
+  .C .btn.pri { background:#FFD23F; }
+  .C .stat { background:#fff; border:2.5px solid #111; border-radius:10px; box-shadow:3px 3px 0 #111; }
+  .C .sq { border:2px solid #111; border-radius:5px; }
+  .C .res-title { font:800 24px/1.15 Unbounded, sans-serif; }
+  .sq { border-radius:7px; }
+</style>
+</head>
+<body>
+<h1>Квартет — три современных направления</h1>
+<p class="lead">Слева — игровой экран в середине партии: одна группа разгадана, игрок выбрал 4 слова. Справа — экран результата с карточкой для шеринга. Слова и темы — пример реальной головоломки (ловушки: ЧАЙКА — и птица, и Чехов; ТРИ СЕСТРЫ — «скрытое число»).</p>
+
+<section class="dir A"><h2>A. Свежий минимализм</h2><p class="note">Светлый тёплый фон, мягкие скруглённые плитки, сочные пастельные цвета групп, плотный гротеск Manrope. Спокойно и «дорого», хорошо читается взрослой аудиторией. Ближе всего к ожиданиям от умной ежедневной игры.</p><div class="row" data-dir="A"></div></section>
+
+<section class="dir B"><h2>B. Тёмное стекло</h2><p class="note">Глубокий фиолетово-чёрный фон, полупрозрачные «стеклянные» плитки, градиенты и свечение. Эффектно и молодо, хорошо смотрится на скриншотах. Минус: тёмная тема по умолчанию менее «дневная», градиенты сложнее держать аккуратными.</p><div class="row" data-dir="B"></div></section>
+
+<section class="dir C"><h2>C. Необрутализм</h2><p class="note">Кремовый фон, толстые чёрные обводки, плоские насыщенные цвета, «жёсткие» тени, крупный Unbounded. Самый заметный и игровой — сразу отличается от всех конкурентов в сторе. Тренд 2025–26 в продуктовых интерфейсах.</p><div class="row" data-dir="C"></div></section>
+
+<script>
+const solved = { lvl:'l1', theme:'Пьесы Чехова', words:'ЧАЙКА · ИВАНОВ · ДЯДЯ ВАНЯ · ТРИ СЕСТРЫ' };
+const board = ['ВОРОНА','ЧЕСТНОЕ','СТОЛБ','СИНИЦА','ПЯТНО','КРЕПКОЕ','ГРАЧ','ТРИУМФ','ПОСЛЕДНЕЕ','СОКОЛ','СЕМЬЯ','ВВОДНОЕ'];
+const sel = new Set(['ВОРОНА','СИНИЦА','ГРАЧ','СОКОЛ']);
+const resRows = [['l1','l1','l1','l1'],['l3','l2','l3','l3'],['l2','l2','l2','l2'],['l3','l3','l3','l3'],['l4','l4','l4','l4']];
+function game(){
+  return `<div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="top"><div class="logo">Квартет</div><div class="meta">№42 · 15 ноября</div></div>
+    <div class="hint">Найди 4 группы по 4 слова</div>
+    <div class="board">
+      <div class="solved ${solved.lvl}"><b>${solved.theme}</b><span>${solved.words}</span></div>
+      ${board.map(w=>`<div class="tile ${sel.has(w)?'sel':''} ${w.length>7?'long':''}">${w}</div>`).join('')}
+    </div>
+    <div class="mist">Ошибки: <i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot off"></i></div>
+    <div class="btns"><div class="btn">Перемешать</div><div class="btn">Снять</div><div class="btn pri">Проверить</div></div>
+    <div class="ad">💡 Подсказка за рекламу</div>
+  </div></div>`;
+}
+function result(){
+  return `<div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="top"><div class="logo">Квартет</div><div class="meta">№42</div></div>
+    <div class="res-title">Отлично! 🎉</div>
+    <div class="res-sub">Решено с одной ошибкой</div>
+    <div class="grid-res">${resRows.flat().map(c=>`<div class="sq ${c}"></div>`).join('')}</div>
+    <div class="stats"><div class="stat"><b>12</b><span>дней подряд</span></div><div class="stat"><b>87%</b><span>побед</span></div><div class="stat"><b>31</b><span>сыграно</span></div></div>
+    <div class="next">Следующий квартет через 14:22:05</div>
+    <div class="btns"><div class="btn">Архив</div><div class="btn pri">Поделиться</div></div>
+  </div></div>`;
+}
+document.querySelectorAll('.row').forEach(r=>{ r.innerHTML = game() + result(); });
+</script>
+</body>
+</html>
