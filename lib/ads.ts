@@ -4,10 +4,15 @@ import { Platform } from 'react-native';
 
 type YandexAds = typeof import('yandex-mobile-ads');
 
-/** Боевые блоки РСЯ (приложение 20213371). В dev-режиме — демо-блоки Яндекса. */
-const UNITS = __DEV__
-  ? { rewarded: 'demo-rewarded-yandex', interstitial: 'demo-interstitial-yandex' }
-  : { rewarded: 'R-M-20213371-1', interstitial: 'R-M-20213371-2' };
+/**
+ * Боевые блоки включаются только после публикации в App Store (переключить OTA в день релиза и
+ * активировать приложение 20213371 в кабинете РСЯ). До этого — демо-блоки Яндекса: показы владельца и
+ * тестировщиков по боевым блокам антифрод может счесть накруткой.
+ */
+const LIVE_ADS = false;
+const UNITS = LIVE_ADS
+  ? { rewarded: 'R-M-20213371-1', interstitial: 'R-M-20213371-2' }
+  : { rewarded: 'demo-rewarded-yandex', interstitial: 'demo-interstitial-yandex' };
 
 let sdk: YandexAds | null = null;
 let initPromise: Promise<boolean> | null = null;
