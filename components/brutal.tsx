@@ -29,7 +29,9 @@ export function BrutalBox({ children, fill, sunk = false, style, contentStyle }:
       <View
         style={[
           {
-            flex: 1,
+            // flexGrow, а не flex: 1 — на iOS flex: 1 (basis 0) схлопывает коробку до нуля, если родитель
+            // не растянут (кнопка, плашка группы). Плитка растягивается своим style={flex: 1}.
+            flexGrow: 1,
             backgroundColor: fill ?? p.surface,
             borderColor: p.ink,
             borderWidth: BORDER,
