@@ -98,10 +98,12 @@ export function BrutalButton({
 interface TileProps {
   word: string;
   selected: boolean;
+  /** Цвет группы, если слово открыто подсказкой. */
+  hint?: string;
   onPress: () => void;
 }
 
-export function Tile({ word, selected, onPress }: TileProps) {
+export function Tile({ word, selected, hint, onPress }: TileProps) {
   const p = usePalette();
   const long = word.length > 7;
   return (
@@ -116,7 +118,7 @@ export function Tile({ word, selected, onPress }: TileProps) {
       style={styles.tileWrap}
     >
       <BrutalBox
-        fill={selected ? p.ink : p.surface}
+        fill={selected ? p.ink : (hint ?? p.surface)}
         sunk={selected}
         style={styles.flex}
         contentStyle={styles.tileContent}
@@ -127,7 +129,7 @@ export function Tile({ word, selected, onPress }: TileProps) {
           minimumFontScale={0.7}
           style={[
             styles.tileText,
-            { color: selected ? p.inkOnInk : p.ink, fontSize: long ? 11 : 13 },
+            { color: selected ? p.inkOnInk : hint ? p.onGroup : p.ink, fontSize: long ? 11 : 13 },
           ]}
         >
           {word}

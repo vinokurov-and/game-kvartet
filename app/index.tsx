@@ -65,7 +65,13 @@ export default function Today() {
               }
             }}
           />
-          {state.status !== 'playing' && <ResultPanel puzzle={puzzle} state={state} />}
+          {state.status !== 'playing' && (
+            <ResultPanel
+              puzzle={puzzle}
+              state={state}
+              onChange={(next) => saveGame(puzzle, next)}
+            />
+          )}
         </>
       )}
     </ScrollView>

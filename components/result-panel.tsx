@@ -4,22 +4,31 @@ import { Share, StyleSheet, Text, View } from 'react-native';
 
 import { BrutalBox, BrutalButton } from '@/components/brutal';
 import { formatCountdown, msUntilNext } from '@/lib/game/daily';
-import type { GameState } from '@/lib/game/engine';
+import { grantExtraLives, type GameState } from '@/lib/game/engine';
 import { shareText } from '@/lib/game/share';
 import { useGameStore } from '@/lib/game/store';
 import type { Puzzle } from '@/lib/game/types';
 import { BORDER, FONT, usePalette } from '@/lib/theme';
+import { useReward } from '@/lib/use-reward';
 
 function title(state: GameState): [string, string] {
   if (state.status === 'lost') return ['Не в этот раз', 'Завтра будет новый квартет'];
+  if (state.continued) return ['Решено!', 'Со второго захода'];
   const m = state.mistakes;
   if (m === 0) return ['Безупречно!', 'Без единой ошибки'];
   if (m === 1) return ['Отлично!', 'Решено с одной ошибкой'];
   return ['Решено!', `Ошибок: ${m}`];
 }
 
-export function ResultPanel({ puzzle, state }: { puzzle: Puzzle; state: GameState }) {
+interface Props {
+  puzzle: Puzzle;
+  state: GameState;
+  onChange: (next: GameState) => void;
+}
+
+export function ResultPanel({ puzzle, state, onChange }: Props) {
   const p = usePalette();
+  const reward = useReward();
   const stats = useGameStore((s) => s.stats);
   const [left, setLeft] = useState(msUntilNext);
 
@@ -66,6 +75,19 @@ export function ResultPanel({ puzzle, state }: { puzzle: Puzzle; state: GameStat
         Следующий квартет через {formatCountdown(left)}
       </Text>
 
+      {state.status === 'lost' && !state.continued && (
+        <BrutalButton
+          label={
+            reward.busy
+              ? 'Загружаем рекламу…'
+              : reward.free
+                ? 'Ещё 4 попытки'
+                : 'Ещё 4 попытки за рекламу'
+          }
+          disabled={reward.busy}
+          onPress={() => void reward.run(() => onChange(grantExtraLives(state)))}
+        />
+      )}
       <BrutalButton
         label="Поделиться"
         primary

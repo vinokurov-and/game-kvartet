@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { kvStorage } from '@/lib/storage';
-import { newGame, type GameState } from './engine';
+import { newGame, withDefaults, type GameState } from './engine';
 import { MAX_MISTAKES, type Puzzle } from './types';
 
 export interface Stats {
@@ -27,6 +27,9 @@ const EMPTY_STATS: Stats = {
 };
 
 interface GameStore {
+  /** Число запусков приложения — первая сессия без рекламы. */
+  sessions: number;
+  startSession: () => void;
   games: Record<string, GameState>;
   stats: Stats;
   /** id квартетов, уже учтённых в статистике (чтобы не засчитать дважды). */
@@ -46,10 +49,15 @@ function dayBefore(date: string): string {
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
+      sessions: 0,
+      startSession: () => set((s) => ({ sessions: s.sessions + 1 })),
       games: {},
       stats: EMPTY_STATS,
       counted: [],
-      getGame: (puzzle) => get().games[puzzle.id] ?? newGame(puzzle),
+      getGame: (puzzle) => {
+        const saved = get().games[puzzle.id];
+        return saved ? withDefaults(saved) : newGame(puzzle);
+      },
       saveGame: (puzzle, state) => set((s) => ({ games: { ...s.games, [puzzle.id]: state } })),
       recordDaily: (puzzle, state) => {
         const { counted, stats } = get();

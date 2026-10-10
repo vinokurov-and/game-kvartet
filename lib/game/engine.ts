@@ -15,8 +15,16 @@ export interface GameState {
   guesses: GroupLevel[][];
   /** Те же попытки словами — чтобы не засчитать ошибку за повтор уже проверенной четвёрки. */
   attempts: string[][];
+  /** Подсказки: открытые темы групп и открытые слова. */
+  hintThemes: GroupLevel[];
+  hintWords: string[];
+  /** Брал «+4 попытки» после поражения — в статистике партия остаётся проигранной. */
+  continued?: boolean;
   status: 'playing' | 'won' | 'lost';
 }
+
+/** Сколько слов группы можно открыть подсказками (четвёртое игрок находит сам). */
+export const MAX_HINT_WORDS = 2;
 
 export function levelOf(puzzle: Puzzle, word: string): GroupLevel {
   const g = puzzle.groups.find((x) => x.words.includes(word));
@@ -55,8 +63,42 @@ export function newGame(puzzle: Puzzle): GameState {
     mistakes: 0,
     guesses: [],
     attempts: [],
+    hintThemes: [],
+    hintWords: [],
     status: 'playing',
   };
+}
+
+/** Сохранённые партии старых версий — без новых полей. */
+export function withDefaults(state: GameState): GameState {
+  return { ...state, hintThemes: state.hintThemes ?? [], hintWords: state.hintWords ?? [] };
+}
+
+/** Группа, к которой относится следующая подсказка: самая лёгкая неразгаданная. */
+export function hintTarget(puzzle: Puzzle, state: GameState) {
+  return (
+    puzzle.groups
+      .filter((g) => !state.solved.includes(g.level))
+      .sort((a, b) => a.level - b.level)[0] ?? null
+  );
+}
+
+/** Есть ли что подсказать. */
+export function canHint(puzzle: Puzzle, state: GameState): boolean {
+  return state.status === 'playing' && nextHint(puzzle, state) !== state;
+}
+
+/** Следующая подсказка: сначала тема целевой группы, затем по одному её слову (до MAX_HINT_WORDS). */
+export function nextHint(puzzle: Puzzle, state: GameState): GameState {
+  const g = hintTarget(puzzle, state);
+  if (!g || state.status !== 'playing') return state;
+  if (!state.hintThemes.includes(g.level)) {
+    return { ...state, hintThemes: [...state.hintThemes, g.level] };
+  }
+  const open = g.words.filter((w) => state.hintWords.includes(w));
+  if (open.length >= MAX_HINT_WORDS) return state;
+  const word = g.words.find((w) => !state.hintWords.includes(w));
+  return word ? { ...state, hintWords: [...state.hintWords, word] } : state;
 }
 
 export function toggle(state: GameState, word: string): GameState {
@@ -127,7 +169,7 @@ export function submit(
 /** Rewarded «+4 ошибки» после проигрыша. */
 export function grantExtraLives(state: GameState): GameState {
   if (state.status !== 'lost') return state;
-  return { ...state, mistakes: 0, status: 'playing' };
+  return { ...state, mistakes: 0, continued: true, status: 'playing' };
 }
 
 /** Раскрыть неразгаданные группы (после поражения) — по возрастанию сложности. */

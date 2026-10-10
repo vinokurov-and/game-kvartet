@@ -15,7 +15,11 @@ import * as Haptics from 'expo-haptics';
 
 import { BrutalButton, GroupBar, Tile } from '@/components/brutal';
 import {
+  canHint,
   deselectAll,
+  hintTarget,
+  levelOf,
+  nextHint,
   remainingGroups,
   shuffleBoard,
   submit,
@@ -25,6 +29,7 @@ import {
 } from '@/lib/game/engine';
 import { MAX_MISTAKES, type Puzzle } from '@/lib/game/types';
 import { BORDER, FONT, usePalette } from '@/lib/theme';
+import { useReward } from '@/lib/use-reward';
 
 const MESSAGES: Partial<Record<GuessResult, string>> = {
   'one-away': 'Почти! Одно слово лишнее',
@@ -51,6 +56,10 @@ export function GameBoard({ puzzle, state, onChange }: Props) {
     },
     [],
   );
+
+  const reward = useReward();
+  const target = hintTarget(puzzle, state);
+  const hintTheme = target && state.hintThemes.includes(target.level) ? target.theme : null;
 
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value }] }));
   const layout = reduced ? undefined : LinearTransition.springify().damping(18);
@@ -106,6 +115,7 @@ export function GameBoard({ puzzle, state, onChange }: Props) {
               <Tile
                 word={w}
                 selected={state.selected.includes(w)}
+                hint={state.hintWords.includes(w) ? p.groups[levelOf(puzzle, w)] : undefined}
                 onPress={() => onChange(toggle(state, w))}
               />
             </Animated.View>
@@ -131,6 +141,11 @@ export function GameBoard({ puzzle, state, onChange }: Props) {
               />
             ))}
           </View>
+          {hintTheme && (
+            <Text style={[styles.hintTheme, { color: p.ink }]}>
+              Подсказка: одна из групп — «{hintTheme}»
+            </Text>
+          )}
           <Text style={[styles.toast, { color: p.ink, opacity: toast ? 1 : 0 }]}>
             {toast ?? ' '}
           </Text>
@@ -154,6 +169,17 @@ export function GameBoard({ puzzle, state, onChange }: Props) {
               style={styles.flex}
             />
           </View>
+          <BrutalButton
+            label={
+              reward.busy
+                ? 'Загружаем рекламу…'
+                : reward.free
+                  ? 'Подсказка'
+                  : 'Подсказка за рекламу'
+            }
+            disabled={!canHint(puzzle, state) || reward.busy}
+            onPress={() => void reward.run(() => onChange(nextHint(puzzle, state)))}
+          />
         </>
       )}
     </View>
@@ -174,6 +200,7 @@ const styles = StyleSheet.create({
   },
   mistakesLabel: { fontFamily: FONT.bodySemi, fontSize: 14 },
   dot: { width: 14, height: 14, borderRadius: 7, borderWidth: BORDER - 0.5 },
+  hintTheme: { fontFamily: FONT.bodySemi, fontSize: 14, textAlign: 'center' },
   toast: { fontFamily: FONT.bodyBold, fontSize: 15, textAlign: 'center', minHeight: 20 },
   actions: { flexDirection: 'row', gap: 8 },
   flex: { flex: 1 },

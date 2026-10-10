@@ -139,3 +139,17 @@ test('архив: только вышедшие, бесплатны текущи
   assert.equal(isFreeArchiveDay('2026-11-17', now), true);
   assert.equal(isFreeArchiveDay('2026-11-16', now), false);
 });
+
+test('подсказки: тема самой лёгкой группы, затем 2 слова, затем следующая группа', async () => {
+  const { nextHint, canHint } = await import('./engine');
+  let s = newGame(P);
+  s = nextHint(P, s);
+  assert.deepEqual(s.hintThemes, [1]);
+  s = nextHint(P, nextHint(P, s));
+  assert.deepEqual(s.hintWords, ['ЧАЙКА', 'ИВАНОВ']);
+  assert.equal(canHint(P, s), false);
+  s = submit(P, pick(s, [...P.groups[0].words])).state;
+  assert.equal(canHint(P, s), true);
+  s = nextHint(P, s);
+  assert.deepEqual(s.hintThemes, [1, 2]);
+});

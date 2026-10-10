@@ -43,6 +43,12 @@
             "backgroundColor": "#161513"
           }
         }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Разрешение позволяет показывать рекламу, которая интереснее именно вам. Без него реклама тоже будет, но случайная."
+        }
       ]
     ],
     "experiments": {
