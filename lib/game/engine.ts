@@ -69,6 +69,13 @@ export function newGame(puzzle: Puzzle): GameState {
   };
 }
 
+/** Подходит ли сохранённая партия к головоломке (контент под тем же id мог смениться обновлением). */
+export function matchesPuzzle(puzzle: Puzzle, state: GameState): boolean {
+  const words = new Set(puzzle.groups.flatMap((g) => g.words));
+  const used = [...state.board, ...state.selected, ...(state.hintWords ?? [])];
+  return used.every((w) => words.has(w)) && state.solved.every((l) => l >= 1 && l <= 4);
+}
+
 /** Сохранённые партии старых версий — без новых полей. */
 export function withDefaults(state: GameState): GameState {
   return { ...state, hintThemes: state.hintThemes ?? [], hintWords: state.hintWords ?? [] };

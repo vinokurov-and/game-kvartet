@@ -162,3 +162,18 @@ test('сохранение старой версии без полей подс�
   assert.equal(canHint(P, restored), true);
   assert.deepEqual(nextHint(P, restored).hintThemes, [1]);
 });
+
+test('партия от другой головоломки под тем же id не подходит (смена контента OTA)', async () => {
+  const { matchesPuzzle } = await import('./engine');
+  const other: Puzzle = {
+    ...P,
+    groups: [
+      { level: 1, theme: 'А', words: ['ЛАДЬЯ', 'ФЕРЗЬ', 'СЛОН', 'КОНЬ'] },
+      P.groups[1],
+      P.groups[2],
+      P.groups[3],
+    ],
+  };
+  assert.equal(matchesPuzzle(P, newGame(P)), true);
+  assert.equal(matchesPuzzle(P, newGame(other)), false);
+});

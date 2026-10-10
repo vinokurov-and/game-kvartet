@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { kvStorage } from '@/lib/storage';
-import { newGame, withDefaults, type GameState } from './engine';
+import { matchesPuzzle, newGame, withDefaults, type GameState } from './engine';
 import { MAX_MISTAKES, type Puzzle } from './types';
 
 export interface Stats {
@@ -74,7 +74,9 @@ export const useGameStore = create<GameStore>()(
       setHaptics: (on) => set({ haptics: on }),
       getGame: (puzzle) => {
         const saved = get().games[puzzle.id];
-        return saved ? withDefaults(saved) : newGame(puzzle);
+        if (!saved) return newGame(puzzle);
+        const state = withDefaults(saved);
+        return matchesPuzzle(puzzle, state) ? state : newGame(puzzle);
       },
       saveGame: (puzzle, state) => set((s) => ({ games: { ...s.games, [puzzle.id]: state } })),
       recordDaily: (puzzle, state) => {
