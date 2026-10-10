@@ -19,3 +19,11 @@ Zustand + MMKV, luxon (даты по МСК). EAS: проект `@vinokurov_and/
 - Ключи (bothub и т.п.) — только в `.env` (в .gitignore), никогда в клиенте.
 - После JS-изменений, дошедших до тестовых сборок, — публиковать EAS Update в preview и production.
 - Никаких LLM-вызовов из приложения: контент генерируется локальным скриптом заранее.
+
+## Уроки (инциденты)
+- 2026-10-10: OTA с новыми полями `GameState` уронила TestFlight-сборку — экран читал сохранение напрямую, без
+  `withDefaults`. Сохранённое состояние читать **только** через `getGame` и проверять web-превью со «старым»
+  localStorage (см. регрессионный тест в `lib/game/game.test.ts`).
+- Не навигировать (`router.push`) из эффектов при старте: корневой layout до загрузки шрифтов рендерит null →
+  «navigate before mounting Root Layout». Показывать нужное на месте.
+- Откат прод-канала: `eas update:republish --group <старая группа> --destination-channel production`.
