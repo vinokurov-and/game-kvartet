@@ -66,7 +66,7 @@
 
 ## 3. Архитектура
 
-- Expo SDK 54, Expo Router, TypeScript strict, Tamagui, Reanimated (анимация плиток), Zustand + MMKV (прогресс),
+- Expo SDK 54, Expo Router, TypeScript strict, RN StyleSheet + свои токены (без Tamagui — решено при старте: игре хватает своих компонентов), Reanimated (анимация плиток), Zustand + MMKV (прогресс),
   luxon (даты МСК), `yandex-mobile-ads` (EAS dev build; в Expo Go реклама не работает).
 - **Без сервера.** Головоломки — JSON в бандле приложения (год вперёд), обфусцированы (не шифрование —
   защита от случайного подсмотра). Добавление и правки — через EAS Update (каналы preview/production).
